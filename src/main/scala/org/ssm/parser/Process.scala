@@ -7,21 +7,50 @@ sealed trait Process[I, S, O] {
 }
 
 object Process {
+  case object End extends Throwable
+  case object Kill extends Throwable
 
-  private case class Start[I, S, O](
-      initState: S,
-      next: Process[I, S, O])
+  case class Start[I, S, O](
+      init: () => (Option[S], Process[I, S, O]))
     extends Process[I, S, O]
 
-  private case class Await[I, S, O](
+  case class Await[I, S, O](
       recv: (Option[I], Process[I, S, O]) => Process[I, S, O])
     extends Process[I, S, O]
 
-  private case class Parse[K, I, S, O](
+  case class Parse[K, I, S, O](
       kind: K,
       run: (I, S) => S,
       next: Process[I, S, O])
     extends Process[I, S, O]
+
+  case class Emit[I, S, O](
+      o: O,
+      next: Process[I, S, O])
+    extends Process[I, S, O]
+
+  case class Halt[I, S, O](
+      i: Option[I],
+      e: Throwable)
+    extends Process[I, S, O]
+
+  def start[I, S, O](init: => (Option[S], Process[I, S, O])): Process[I, S, O] =
+    Start(() => init)
+
+  def await[I, S, O](recv: (Option[I], Process[I, S, O]) => Process[I, S, O]): Process[I, S, O] =
+    Await(recv)
+
+  def parse[K, I, S, O](kind: K)(next: Process[I, S, O])(run: (I, S) => S): Process[I, S, O] =
+    Parse(kind, run, next)
+
+  def emit[I, S, O](o: O)(next: Process[I, S, O] = end[I, S, O]): Process[I, S, O] =
+    Emit(o, next)
+
+  def end[I, S, O]: Process[I, S, O] =
+    Halt(None, End)
+
+  def kill[I, S, O](i: I): Process[I, S, O] =
+    Halt(Some(i), Kill)
 }
 
 sealed trait SSMParseKind
@@ -43,12 +72,7 @@ object SSMProcess {
   def parseSSMMessage(str: String): SSMMessage =
     ssmProcess()
 
-  def toJsonString(sSMMessage: SSMMessage): String = ???
+  def toJsonString(ssmMessage: SSMMessage): String = ???
 
   private val ssmProcess: SSMProcess = ???
-
-  private val ssmReceiver: (Option[Input], SSMProcess) => SSMProcess =
-    (input, prev) => {
-      ???
-    }
 }
