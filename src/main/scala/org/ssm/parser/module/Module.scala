@@ -1,7 +1,7 @@
 package org.ssm.parser.module
 
 import org.ssm.parser.SSMProcess.Input
-import org.ssm.parser.domain.SSMMessage
+import org.ssm.parser.domain.{SSMMessage, SubMessageAction}
 
 import scala.util
 import scala.util.{Success, Try}
@@ -25,13 +25,35 @@ trait NoExtractSSMModule extends SSMModule {
   type R = Unit
   type F = Unit
 
-  def canProcess(input: Input): Boolean
-
-  def process(input: Input, state: SSMMessage): SSMMessage = ???
+  override def process(input: Input, state: SSMMessage): SSMMessage = ???
 
   override private[module] def extract(input: Input): Unit =
     ()
 
   override private[module] def format(r: Unit): Try[Unit] =
     Success(())
+}
+
+object ToAddressModule extends NoExtractSSMModule {
+  def canProcess(input: Input): Boolean = ???
+}
+
+object FromAddressModule extends NoExtractSSMModule {
+  def canProcess(input: Input): Boolean = ???
+}
+
+object IdentifierModule extends NoExtractSSMModule {
+  def canProcess(input: Input): Boolean = ???
+}
+
+object TimeModeModule extends NoExtractSSMModule {
+  def canProcess(input: Input): Boolean = ???
+}
+
+object OtherInformationModule extends NoExtractSSMModule {
+  def canProcess(input: Input): Boolean = ???
+}
+
+object SubMessageModule extends NoExtractSSMModule {
+  def canProcess(input: Input): Boolean = ???
 }
