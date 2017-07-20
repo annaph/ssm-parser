@@ -3,6 +3,7 @@ package org.ssm.parser.module
 import org.ssm.parser.SSMProcess.Input
 import org.ssm.parser.domain.SSMMessage
 
+import scala.util.matching.Regex
 import scala.util.{Success, Try}
 
 trait Module[I, S] {
@@ -33,21 +34,25 @@ trait NoExtractSSMModule extends SSMModule {
     Success(())
 }
 
-object ToAddressModule extends NoExtractSSMModule {
-  def canProcess(input: Input): Boolean = {
-    val toAddressRegex = "(^Q)(.*$)".r
-
-    input._2 match {
-      case toAddressRegex(_, _) =>
-        true
-      case _ =>
-        false
-    }
+object SSMModule {
+  def matchLine(line: String, regex: Regex): Boolean = line match {
+    case regex(_, _) =>
+      true
+    case _ =>
+      false
   }
 }
 
+import org.ssm.parser.module.SSMModule.matchLine
+
+object ToAddressModule extends NoExtractSSMModule {
+  def canProcess(input: Input): Boolean =
+    matchLine(input._2, "(^Q)(.*$)".r)
+}
+
 object FromAddressModule extends NoExtractSSMModule {
-  def canProcess(input: Input): Boolean = ???
+  def canProcess(input: Input): Boolean =
+    matchLine(input._2, "(^[.])(.*$)".r)
 }
 
 object IdentifierModule extends NoExtractSSMModule {
