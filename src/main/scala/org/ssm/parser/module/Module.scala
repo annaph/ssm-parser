@@ -35,7 +35,14 @@ trait NoExtractSSMModule extends SSMModule {
 }
 
 object SSMModule {
-  def matchLine(line: String, regex: Regex): Boolean = line match {
+  def matchOneGroupLine(line: String, regex: Regex): Boolean = line match {
+    case regex(_) =>
+      true
+    case _ =>
+      false
+  }
+
+  def matchTwoGroupLine(line: String, regex: Regex): Boolean = line match {
     case regex(_, _) =>
       true
     case _ =>
@@ -43,20 +50,21 @@ object SSMModule {
   }
 }
 
-import org.ssm.parser.module.SSMModule.matchLine
+import org.ssm.parser.module.SSMModule._
 
 object ToAddressModule extends NoExtractSSMModule {
   def canProcess(input: Input): Boolean =
-    matchLine(input._2, "(^Q)(.*$)".r)
+    matchTwoGroupLine(input._2, "(^Q)(.*$)".r)
 }
 
 object FromAddressModule extends NoExtractSSMModule {
   def canProcess(input: Input): Boolean =
-    matchLine(input._2, "(^[.])(.*$)".r)
+    matchTwoGroupLine(input._2, "(^[.])(.*$)".r)
 }
 
 object IdentifierModule extends NoExtractSSMModule {
-  def canProcess(input: Input): Boolean = ???
+  def canProcess(input: Input): Boolean =
+    matchOneGroupLine(input._2, "(^SSM$)".r)
 }
 
 object TimeModeModule extends NoExtractSSMModule {

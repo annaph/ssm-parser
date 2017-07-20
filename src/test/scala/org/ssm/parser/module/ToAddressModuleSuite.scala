@@ -15,10 +15,10 @@ class ToAddressModuleSuite extends FunSuite with Matchers with Checkers {
 
   implicit val toAddressAr: Arbitrary[String] = Arbitrary {
     for {
-      isQ <- arbitrary[Boolean]
+      hasQ <- arbitrary[Boolean]
       rest <- Gen.alphaStr
     } yield {
-      if (isQ)
+      if (hasQ)
         'Q' + rest
       else
         rest

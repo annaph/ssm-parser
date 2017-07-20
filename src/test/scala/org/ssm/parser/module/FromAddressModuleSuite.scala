@@ -15,10 +15,10 @@ class FromAddressModuleSuite extends FunSuite with Matchers with Checkers {
 
   implicit val fromAddressAr: Arbitrary[String] = Arbitrary {
     for {
-      isQ <- arbitrary[Boolean]
+      hasDot <- arbitrary[Boolean]
       rest <- Gen.alphaStr
     } yield {
-      if (isQ)
+      if (hasDot)
         '.' + rest
       else
         rest
