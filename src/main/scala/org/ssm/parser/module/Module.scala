@@ -68,7 +68,8 @@ object IdentifierModule extends NoExtractSSMModule {
 }
 
 object TimeModeModule extends NoExtractSSMModule {
-  def canProcess(input: Input): Boolean = ???
+  def canProcess(input: Input): Boolean =
+    matchOneGroupLine(input._2, "(^UTC|LT$)".r)
 }
 
 object OtherInformationModule extends NoExtractSSMModule {
