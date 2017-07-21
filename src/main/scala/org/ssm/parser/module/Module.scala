@@ -78,5 +78,6 @@ object OtherInformationModule extends NoExtractSSMModule {
 }
 
 object SubMessageModule extends NoExtractSSMModule {
-  def canProcess(input: Input): Boolean = ???
+  def canProcess(input: Input): Boolean =
+    matchOneGroupLine(input._2, "(^//$)".r)
 }
