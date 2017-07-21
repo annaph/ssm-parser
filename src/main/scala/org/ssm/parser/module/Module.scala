@@ -73,7 +73,8 @@ object TimeModeModule extends NoExtractSSMModule {
 }
 
 object OtherInformationModule extends NoExtractSSMModule {
-  def canProcess(input: Input): Boolean = ???
+  def canProcess(input: Input): Boolean =
+    matchOneGroupLine(input._2, "(.+$)".r)
 }
 
 object SubMessageModule extends NoExtractSSMModule {
