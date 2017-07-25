@@ -2,8 +2,10 @@ package org.ssm.parser
 
 import org.ssm.parser.domain.SSMMessage
 
+import scala.util.Properties.lineSeparator
+
 sealed trait Process[I, S, O] {
-  def apply(): O = ???
+  def apply(s: Stream[I]): O = ???
 }
 
 object Process {
@@ -70,7 +72,8 @@ object SSMProcess {
   type SSMProcess = Process[Input, SSMMessage, SSMMessage]
 
   def parseSSMMessage(str: String): SSMMessage =
-    ssmProcess()
+    ???
+    //ssmProcess((str split lineSeparator).toStream)
 
   def toJsonString(ssmMessage: SSMMessage): String = ???
 
