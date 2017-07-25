@@ -16,22 +16,23 @@ trait Module[I, S] {
 
   private[module] def extract(input: I): R
 
-  private[module] def format(r: R): Try[F]
+  private[module] def format(rawData: R): Try[F]
 }
 
 trait SSMModule extends Module[Input, SSMMessage]
 
-trait NoExtractSSMModule extends SSMModule {
+trait NoExtractModule extends SSMModule {
   type R = Unit
   type F = Unit
 
-  override def process(input: Input, state: SSMMessage): SSMMessage = ???
+  override def process(input: Input, state: SSMMessage): SSMMessage =
+    state
 
   override private[module] def extract(input: Input): Unit =
     ()
 
-  override private[module] def format(r: Unit): Try[Unit] =
-    Success(())
+  override private[module] def format(rawData: Unit): Try[Unit] =
+    Success(rawData)
 }
 
 object SSMModule {
@@ -52,32 +53,32 @@ object SSMModule {
 
 import org.ssm.parser.module.SSMModule._
 
-object ToAddressModule extends NoExtractSSMModule {
+object ToAddressModule extends NoExtractModule {
   def canProcess(input: Input): Boolean =
     matchTwoGroupLine(input._2, "(^Q)(.*$)".r)
 }
 
-object FromAddressModule extends NoExtractSSMModule {
+object FromAddressModule extends NoExtractModule {
   def canProcess(input: Input): Boolean =
     matchTwoGroupLine(input._2, "(^[.])(.*$)".r)
 }
 
-object IdentifierModule extends NoExtractSSMModule {
+object IdentifierModule extends NoExtractModule {
   def canProcess(input: Input): Boolean =
     matchOneGroupLine(input._2, "(^SSM$)".r)
 }
 
-object TimeModeModule extends NoExtractSSMModule {
+object TimeModeModule extends NoExtractModule {
   def canProcess(input: Input): Boolean =
     matchOneGroupLine(input._2, "(^UTC|LT$)".r)
 }
 
-object OtherInformationModule extends NoExtractSSMModule {
+object OtherInformationModule extends NoExtractModule {
   def canProcess(input: Input): Boolean =
     matchOneGroupLine(input._2, "(.+$)".r)
 }
 
-object SubMessageModule extends NoExtractSSMModule {
+object SubMessageModule extends NoExtractModule {
   def canProcess(input: Input): Boolean =
     matchOneGroupLine(input._2, "(^//$)".r)
 }
