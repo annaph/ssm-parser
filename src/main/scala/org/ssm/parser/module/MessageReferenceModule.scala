@@ -5,7 +5,7 @@ import org.ssm.parser.domain.SSMMessage
 
 import scala.util.Try
 
-object ReferenceModule extends SSMModule {
+object MessageReferenceModule extends SSMModule {
   type R = String
   type F = String
 
