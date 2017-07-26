@@ -21,20 +21,6 @@ trait Module[I, S] {
 
 trait SSMModule extends Module[Input, SSMMessage]
 
-trait NoExtractModule extends SSMModule {
-  type R = Unit
-  type F = Unit
-
-  override def process(input: Input, state: SSMMessage): SSMMessage =
-    state
-
-  override private[module] def extract(input: Input): Unit =
-    ()
-
-  override private[module] def format(rawData: Unit): Try[Unit] =
-    Success(rawData)
-}
-
 object SSMModule {
   def matchOneGroupLine(line: String, regex: Regex): Boolean = line match {
     case regex(_) =>
@@ -49,6 +35,20 @@ object SSMModule {
     case _ =>
       false
   }
+}
+
+abstract class NoExtractModule extends SSMModule {
+  type R = Unit
+  type F = Unit
+
+  override def process(input: Input, state: SSMMessage): SSMMessage =
+    state
+
+  override private[module] def extract(input: Input): Unit =
+    ()
+
+  override private[module] def format(rawData: Unit): Try[Unit] =
+    Success(rawData)
 }
 
 import org.ssm.parser.module.SSMModule._
