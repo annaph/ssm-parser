@@ -27,7 +27,7 @@ class NoExtractModuleSuite extends FunSuite with Matchers {
     }
   }
 
-  test("Format input") {
+  test("Extract input") {
     new TestFixture {
       val actual: Unit = extract(input)
 
@@ -35,7 +35,7 @@ class NoExtractModuleSuite extends FunSuite with Matchers {
     }
   }
 
-  test("Extract raw data") {
+  test("Format raw data") {
     new TestFixture {
       val actual: Try[Unit] = format(rawData)
 

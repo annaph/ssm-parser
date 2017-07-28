@@ -2,16 +2,16 @@ package org.ssm.parser.module
 
 import org.junit.runner.RunWith
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Prop.forAll
+import org.scalacheck.{Arbitrary, Gen, Prop}
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.prop.Checkers
 import org.scalatest.{FunSuite, Matchers}
 import org.ssm.parser.SSMProcess.Input
+import org.ssm.parser.domain.SSMMessage
 import org.ssm.parser.module.MessageReferenceModule._
-import org.scalacheck.Prop.forAll
-import org.scalacheck.{Arbitrary, Gen, Prop}
 
-import scala.util.{Failure, Try, Success}
+import scala.util.{Failure, Success, Try}
 
 @RunWith(classOf[JUnitRunner])
 class MessageReferenceModuleSuite extends FunSuite with Matchers with Checkers {
@@ -21,13 +21,101 @@ class MessageReferenceModuleSuite extends FunSuite with Matchers with Checkers {
       hasPrefix <- arbitrary[Boolean]
       hasSuffix <- arbitrary[Boolean]
       hasMessageRef <- arbitrary[Boolean]
+      isValidMessageRef <- arbitrary[Boolean]
       prefix <- if (hasPrefix) Gen.alphaStr else Gen.const("")
       suffix <- if (hasSuffix) Gen.alphaStr else Gen.const("")
-      middle <- validMessageRefGen
+      middle <- {
+        if (hasMessageRef && isValidMessageRef)
+          validMessageRefGen
+        else if (hasMessageRef && !isValidMessageRef)
+          invalidMessageRefGen
+        else
+          Gen.const("")
+      }
     } yield prefix + middle + suffix
   }
 
-  def validMessageRefGen: Gen[String] = {
+  trait TestFixture {
+    val longInput: Input = 0 -> "24MAY00144E003/REF 123/449"
+    val shortInput: Input = 0 -> "24MAY00144E003"
+    val invalidInput: Input = 0 -> "invalid"
+
+    val state = SSMMessage("", List())
+  }
+
+  test("Should be able to process valid MessageReference line") {
+    new TestFixture {
+      val actual = canProcess(longInput)
+
+      actual should be(true)
+    }
+  }
+
+  test("Should not be able to process invalid MessageReference line") {
+    new TestFixture {
+      val actual = canProcess(invalidInput)
+
+      actual should be(false)
+    }
+  }
+
+  test("Can process line as MessageReference line") {
+    val propMessageRefrence: Prop = forAll(messageRefAr.arbitrary) { (line: String) =>
+      val canProcessLine = canProcess(0 -> line)
+
+      if (line.size < 14)
+        canProcessLine == false
+      else {
+        Try {
+          line.substring(0, 1).toInt
+          line.substring(5, 10).toInt
+          line.substring(11, 14).toInt
+        } match {
+          case Success(_) =>
+            canProcessLine == true
+          case Failure(_) =>
+            canProcessLine == false
+        }
+      }
+    }
+
+    check(propMessageRefrence)
+  }
+
+  test("Extract input - 24MAY00144E003/REF 123/449") {
+    new TestFixture {
+      val actual: String = extract(longInput)
+
+      actual should be(longInput._2.take(14))
+    }
+  }
+
+  test("Extract input - 24MAY00144E003") {
+    new TestFixture {
+      val actual: String = extract(shortInput)
+
+      actual should be(shortInput._2)
+    }
+  }
+
+  test("Format raw data") {
+    new TestFixture {
+      val actual: Try[String] = format(shortInput._2)
+
+      actual should be(Success(shortInput._2))
+    }
+  }
+
+  test("Process input") {
+    new TestFixture {
+      val actual: SSMMessage = process(shortInput, state)
+
+      actual.messageReference should be(shortInput._2)
+      actual.subMessages should be(state.subMessages)
+    }
+  }
+
+  def validMessageRefGen: Gen[String] =
     for {
       firstChar <- Gen.numChar.map(_.toString)
       secondChar <- Gen.numChar.map(_.toString)
@@ -43,7 +131,7 @@ class MessageReferenceModuleSuite extends FunSuite with Matchers with Checkers {
       twelfthChar <- Gen.numChar.map(_.toString)
       thirteenthChar <- Gen.numChar.map(_.toString)
       fourteenthChar <- Gen.numChar.map(_.toString)
-    } yield  (
+    } yield (
       firstChar
         + secondChar
         + thirdChar
@@ -59,7 +147,6 @@ class MessageReferenceModuleSuite extends FunSuite with Matchers with Checkers {
         + thirteenthChar
         + fourteenthChar
       )
-  }
 
   def invalidMessageRefGen: Gen[String] =
     for {
@@ -107,55 +194,4 @@ class MessageReferenceModuleSuite extends FunSuite with Matchers with Checkers {
         + thirteenthChar
         + fourteenthChar
       )
-
-  test("Should be able to process valid MessageReference line") {
-    val input: Input = 0 -> "24MAY00144E003/REF 123/449"
-
-    val actual = canProcess(input)
-    val expected = true
-
-    actual should be(expected)
-  }
-
-  test("Should not be able to process invalid MessageReference line") {
-    val input: Input = 0 -> "invalid"
-
-    val actual = canProcess(input)
-    val expected = false
-
-    actual should be(expected)
-  }
-
-  test("Can process line as MessageReference line") {
-    val propMessageRefrence: Prop = forAll(messageRefAr.arbitrary) { (line: String) =>
-      val canProcessLine = canProcess(0 -> line)
-
-      if (line.size < 14)
-        canProcessLine == false
-      else {
-        val str1 = line.substring(0, 1)
-        val str2 = line.substring(5, 10)
-        val str3 = line.substring(11, 14)
-
-        println("line: " + line)
-        println("str1: " + str1)
-        println("str2: " + str2)
-        println("str3: " + str3)
-        println("---------------------------------")
-
-        Try {
-          str1.toInt
-          str2.toInt
-          str3.toInt
-        } match {
-          case Success(_) =>
-            canProcessLine == true
-          case Failure(_) =>
-            canProcessLine == false
-        }
-      }
-    }
-
-    check(propMessageRefrence)
-  }
 }
