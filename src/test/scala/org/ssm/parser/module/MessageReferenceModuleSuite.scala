@@ -86,7 +86,7 @@ class MessageReferenceModuleSuite extends FunSuite with Matchers with Checkers {
     new TestFixture {
       val actual: String = extract(longInput)
 
-      actual should be(longInput._2.take(14))
+      actual should be(longInput._2 take 14)
     }
   }
 

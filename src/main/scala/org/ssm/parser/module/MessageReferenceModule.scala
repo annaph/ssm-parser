@@ -20,6 +20,6 @@ object MessageReferenceModule extends SSMModule {
   private[module] def extract(input: Input): String =
     input._2 take 14
 
-  private[module] def format(r: String): Try[String] =
-    Success(r)
+  private[module] def format(rawData: String): Try[String] =
+    Success(rawData)
 }
