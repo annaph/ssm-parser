@@ -40,7 +40,7 @@ class MessageReferenceModuleSuite extends FunSuite with Matchers with Checkers {
     val shortInput: Input = 0 -> "24MAY00144E003"
     val invalidInput: Input = 0 -> "invalid"
 
-    val state = SSMMessage("", List())
+    val state = SSMMessage(Some(""), List())
   }
 
   test("Should be able to process valid MessageReference line") {
@@ -110,7 +110,7 @@ class MessageReferenceModuleSuite extends FunSuite with Matchers with Checkers {
     new TestFixture {
       val actual: SSMMessage = process(shortInput, state)
 
-      actual.messageReference should be(shortInput._2)
+      actual.messageReference should be(Some(shortInput._2))
       actual.subMessages should be(state.subMessages)
     }
   }

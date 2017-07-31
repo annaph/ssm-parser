@@ -3,6 +3,7 @@ package org.ssm.parser.module
 import org.ssm.parser.SSMProcess.Input
 import org.ssm.parser.domain._
 import org.ssm.parser.module.SSMModule.matchTwoGroupLine
+import org.ssm.parser.util.PipeOps._
 
 import scala.util.{Success, Try}
 
@@ -13,7 +14,12 @@ object ActionModule extends SSMModule {
   def canProcess(input: Input): Boolean =
     matchTwoGroupLine(input._2, """(^NEW|CNL|RPL|SKD|ACK|ADM|CON|EQT|FLT|NAC|REV|RSD|TIM)(.*$)""".r)
 
-  def process(input: Input, state: SSMMessage): SSMMessage = ???
+  def process(input: Input, state: SSMMessage): SSMMessage = {
+    val action = input |> extract |> format |> {
+      _.get
+    }
+    state copy (subMessages = SubMessage(Some(action), None, List()) :: state.subMessages)
+  }
 
   private[module] def extract(input: Input): String =
     input._2 take 3
@@ -36,7 +42,7 @@ object ActionModule extends SSMModule {
     case "ADM" =>
       Success(ADM)
     case "CON" =>
-      Success(CON)
+      Success(COV)
     case "FLT" =>
       Success(FLT)
     case "NAC" =>

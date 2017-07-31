@@ -51,8 +51,8 @@ class ActionModuleSuite extends FunSuite with Matchers with Checkers {
     val newXASMInput: Input = 0 -> "NEW XASM"
 
     private val flightDesignator = FlightDesignator("LX", 543)
-    private val subMessage = SubMessage(CNL, flightDesignator, List())
-    val state = SSMMessage("24MAY00144E003", List(subMessage))
+    private val subMessage = SubMessage(Some(CNL), Some(flightDesignator), List())
+    val state = SSMMessage(Some("24MAY00144E003"), List(subMessage))
   }
 
   test("Should be able to process NEW Action line") {
@@ -268,7 +268,7 @@ class ActionModuleSuite extends FunSuite with Matchers with Checkers {
     new TestFixture {
       val actual: Try[SubMessageAction] = format(conInput._2)
 
-      actual should be(Success(CON))
+      actual should be(Success(COV))
     }
   }
 
@@ -309,7 +309,7 @@ class ActionModuleSuite extends FunSuite with Matchers with Checkers {
       val actual: SSMMessage = process(newInput, state)
 
       actual.messageReference should be(state.messageReference)
-      //actual.subMessages should be (state.subMessages)
+      actual.subMessages should be(SubMessage(Some(NEW), None, List()) :: state.subMessages)
     }
   }
 }

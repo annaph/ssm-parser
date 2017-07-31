@@ -15,7 +15,7 @@ class NoExtractModuleSuite extends FunSuite with Matchers {
       true
 
     val input = (0 -> "")
-    val state = SSMMessage("", List())
+    val state = SSMMessage(Some(""), List())
     val rawData = ()
   }
 

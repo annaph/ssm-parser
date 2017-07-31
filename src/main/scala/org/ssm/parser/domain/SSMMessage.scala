@@ -15,19 +15,19 @@ case object RPL extends SubMessageAction
 case object SKD extends SubMessageAction
 case object ACK extends SubMessageAction
 case object ADM extends SubMessageAction
-case object CON extends SubMessageAction
+case object COV extends SubMessageAction
 case object FLT extends SubMessageAction
 case object NAC extends SubMessageAction
 case object REV extends SubMessageAction
 case object RSD extends SubMessageAction
 
 case class SSMMessage(
-  messageReference: String,
+  messageReference: Option[String],
   subMessages: List[SubMessage])
 
 case class SubMessage(
-  action: SubMessageAction,
-  flightDesignator: FlightDesignator,
+  action: Option[SubMessageAction],
+  flightDesignator: Option[FlightDesignator],
   periodInformations: List[PeriodInformation])
 
 case class FlightDesignator(
