@@ -60,7 +60,7 @@ class MessageReferenceModuleSuite extends FunSuite with Matchers with Checkers {
   }
 
   test("Can process line as MessageReference line") {
-    val propMessageRefrence: Prop = forAll(messageRefAr.arbitrary) { (line: String) =>
+    val propMessageRefrence: Prop = forAll { (line: String) =>
       val canProcessLine = canProcess(0 -> line)
 
       if (line.size < 14)

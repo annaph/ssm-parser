@@ -35,6 +35,13 @@ object SSMModule {
     case _ =>
       false
   }
+
+  def matchThreeGroupLine(line: String, regex: Regex): Boolean = line match {
+    case regex(_, _, _) =>
+      true
+    case _ =>
+      false
+  }
 }
 
 abstract class NoExtractModule extends SSMModule {
