@@ -4,12 +4,16 @@ import org.ssm.parser.SSMProcess.Input
 
 import scala.util.Try
 import org.ssm.parser.domain.{PeriodInformation, SSMMessage}
+import org.ssm.parser.module.SSMModule.matchThreeGroupLine
 
 object PeriodInformationModule extends SSMModule {
   type R = String
   type F = PeriodInformation
 
-  def canProcess(input: Input): Boolean = ???
+  private val reg = """(^\d{2}[A-Z]{3}\d{0,2}\b)(.\d{2}[A-Z]{3}\d{0,2}\b)(.*$)""".r
+
+  def canProcess(input: Input): Boolean =
+    matchThreeGroupLine(input._2, reg)
 
   def process(input: Input, state: SSMMessage): SSMMessage = ???
 
