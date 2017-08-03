@@ -1,15 +1,16 @@
 package org.ssm.parser.module
 
 import org.junit.runner.RunWith
-import org.scalatest.{FunSuite, Matchers}
-import org.scalatest.junit.JUnitRunner
-import org.ssm.parser.SSMProcess.Input
-import PeriodInformationModule.canProcess
-import org.scalacheck.Gen
 import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Prop.forAll
+import org.scalacheck.{Gen, Prop}
+import org.scalatest.junit.JUnitRunner
+import org.scalatest.prop.Checkers
+import org.scalatest.{FunSuite, Matchers}
+import org.ssm.parser.module.PeriodInformationModule.canProcess
 
 @RunWith(classOf[JUnitRunner])
-class PeriodInformationModuleCanProcessSuite extends FunSuite with Matchers {
+class PeriodInformationModuleCanProcessSuite extends FunSuite with Matchers with Checkers {
 
   test("Should be able to process valid PeriodInformation line") {
     val actual: Boolean = canProcess(0 -> "12AUG17 30SEP17 1234567/W1 6/LX545A/1")
@@ -25,11 +26,23 @@ class PeriodInformationModuleCanProcessSuite extends FunSuite with Matchers {
   }
 
   test("Can process valid FlightInformation line") {
-    ???
+    val propValidPeriodInformation: Prop = forAll(validPeriodInformationLineGen) { (line: String) =>
+      val canProcessLine = canProcess(0 -> line)
+
+      canProcessLine == true
+    }
+
+    check(propValidPeriodInformation)
   }
 
   test("Cannot process invalid FlightInformation line") {
-    ???
+    val propInvalidPeriodInformation: Prop = forAll(invalidPeriodInformationLineGen) { (line: String) =>
+      val canProcessLine = canProcess(0 -> line)
+
+      canProcessLine == false
+    }
+
+    check(propInvalidPeriodInformation)
   }
 
   def validPeriodInformationLineGen: Gen[String] =
@@ -74,6 +87,7 @@ class PeriodInformationModuleCanProcessSuite extends FunSuite with Matchers {
         + fifthChar
         + sixthChar
         + seventhChar
+        + " "
       )
 
   def daysOfOperationGen: Gen[String] =
@@ -108,11 +122,11 @@ class PeriodInformationModuleCanProcessSuite extends FunSuite with Matchers {
       rest <- {
         if (hasFrequencyRateChar)
           Gen.oneOf(List(true, false)) flatMap {
-            if (_) Gen.const("/W1") else Gen.const("/W2")
+            if (_) Gen.alphaStr.map("/W1" + _) else Gen.alphaStr.map("/W2" + _)
           }
         else
           Gen.oneOf(List(true, false)) flatMap {
-            if (_) Gen.alphaStr else Gen.const("")
+            if (_) Gen.alphaStr.map(" " + _) else Gen.const("")
           }
       }
     } yield rest

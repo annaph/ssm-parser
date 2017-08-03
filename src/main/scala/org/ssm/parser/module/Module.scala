@@ -1,5 +1,7 @@
 package org.ssm.parser.module
 
+import java.time.Month
+
 import org.ssm.parser.SSMProcess.Input
 import org.ssm.parser.domain.SSMMessage
 
@@ -42,6 +44,8 @@ object SSMModule {
     case _ =>
       false
   }
+
+  def toMonth(str: String): Option[Month] = ???
 }
 
 abstract class NoExtractModule extends SSMModule {
