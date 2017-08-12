@@ -45,7 +45,34 @@ object SSMModule {
       false
   }
 
-  def toMonth(str: String): Option[Month] = ???
+  def toMonth(str: String): Option[Month] = str match {
+    case "JAN" =>
+      Some(Month.JANUARY)
+    case "FEB" =>
+      Some(Month.FEBRUARY)
+    case "MAR" =>
+      Some(Month.MARCH)
+    case "APR" =>
+      Some(Month.APRIL)
+    case "MAY" =>
+      Some(Month.MAY)
+    case "JUN" =>
+      Some(Month.JUNE)
+    case "JUL" =>
+      Some(Month.JULY)
+    case "AUG" =>
+      Some(Month.AUGUST)
+    case "SEP" =>
+      Some(Month.SEPTEMBER)
+    case "OCT" =>
+      Some(Month.OCTOBER)
+    case "NOV" =>
+      Some(Month.NOVEMBER)
+    case "DEC" =>
+      Some(Month.DECEMBER)
+    case _ =>
+      None
+  }
 }
 
 abstract class NoExtractModule extends SSMModule {
