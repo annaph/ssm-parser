@@ -39,5 +39,5 @@ object PeriodInformationModule extends SSMModule {
 
   private def formatDaysOfOperation(daysOfOperation: String): Try[Set[DayOfWeek]] = ???
 
-  private def formatFrequencyRate(str: String): Try[FrequencyRate] = ???
+  private[module] def formatFrequencyRate(frequencyRate: String): Try[FrequencyRate] = ???
 }
