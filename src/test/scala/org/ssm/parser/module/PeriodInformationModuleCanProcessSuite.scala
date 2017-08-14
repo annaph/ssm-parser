@@ -2,7 +2,7 @@ package org.ssm.parser.module
 
 import org.junit.runner.RunWith
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Prop.forAll
+import org.scalacheck.Prop.{BooleanOperators, forAll}
 import org.scalacheck.{Gen, Prop}
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.prop.Checkers
@@ -27,9 +27,11 @@ class PeriodInformationModuleCanProcessSuite extends FunSuite with Matchers with
 
   test("Can process valid FlightInformation line") {
     val propValidPeriodInformation: Prop = forAll(validPeriodInformationLineGen) { (line: String) =>
-      val canProcessLine = canProcess(0 -> line)
+      (!line.isEmpty) ==> {
+        val canProcessLine = canProcess(0 -> line)
 
-      canProcessLine == true
+        canProcessLine == true
+      }
     }
 
     check(propValidPeriodInformation)

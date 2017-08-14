@@ -5,6 +5,7 @@ import java.time.{DayOfWeek, LocalDate}
 import org.ssm.parser.SSMProcess.Input
 import org.ssm.parser.domain._
 
+import scala.annotation.tailrec
 import scala.util.{Failure, Success, Try}
 
 object PeriodInformationModule extends SSMModule {
@@ -37,7 +38,33 @@ object PeriodInformationModule extends SSMModule {
 
   private def formatDates(fromDate: String, toDate: String): Try[(LocalDate, LocalDate)] = ???
 
-  private def formatDaysOfOperation(daysOfOperation: String): Try[Set[DayOfWeek]] = ???
+  private[module] def formatDaysOfOperation(daysOfOperation: String): Try[List[DayOfWeek]] = {
+    import scala.collection.mutable
+    type Days = Try[mutable.ListBuffer[DayOfWeek]]
+
+    @tailrec
+    def go(cs: List[Char], prev: Int, acc: Days): Days = cs match {
+      case Nil =>
+        acc
+      case h :: t =>
+        Try {
+          h.toString.toInt
+        } match {
+          case Success(i) if i > prev =>
+            go(t, i, acc map {
+              _ += DayOfWeek of i
+            })
+          case _ =>
+            Failure(new Exception(s"Days of operation '$daysOfOperation' invalid"))
+        }
+    }
+
+    go(daysOfOperation.toCharArray.toList, 0, Success {
+      mutable.ListBuffer()
+    }) map {
+      _.toList
+    }
+  }
 
   private[module] def formatFrequencyRate(frequencyRate: String): Try[FrequencyRate] =
     if (frequencyRate.isEmpty || (frequencyRate startsWith " ")) {
@@ -49,9 +76,9 @@ object PeriodInformationModule extends SSMModule {
         case "/W2" =>
           Success(TwoWeekFrequencyRate)
         case _ =>
-          Failure(new Exception("Frequency rate invalid"))
+          Failure(new Exception(s"Frequency rate in '$frequencyRate' invalid"))
       }
     } else {
-      Failure(new Exception("Frequency rate invalid"))
+      Failure(new Exception(s"Frequency rate in '$frequencyRate' invalid"))
     }
 }
