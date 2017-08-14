@@ -36,7 +36,7 @@ object PeriodInformationModule extends SSMModule {
 
   private[module] def format(rawData: ExtractedData): Try[PeriodInformation] = ???
 
-  private def formatDates(fromDate: String, toDate: String): Try[(LocalDate, LocalDate)] = ???
+  private[module] def formatDates(fromDate: String, toDate: String): Try[(LocalDate, LocalDate)] = ???
 
   private[module] def formatDaysOfOperation(daysOfOperation: String): Try[List[DayOfWeek]] = {
     import scala.collection.mutable
