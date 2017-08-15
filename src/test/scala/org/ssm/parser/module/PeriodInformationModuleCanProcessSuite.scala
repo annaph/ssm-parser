@@ -2,7 +2,7 @@ package org.ssm.parser.module
 
 import org.junit.runner.RunWith
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Prop.{BooleanOperators, forAll}
+import org.scalacheck.Prop.forAll
 import org.scalacheck.{Gen, Prop}
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.prop.Checkers
@@ -25,13 +25,15 @@ class PeriodInformationModuleCanProcessSuite extends FunSuite with Matchers with
     actual should be(false)
   }
 
+  test("Should not be able to process invalid PeriodInformation line - 12AUG1 30SEP1 1234567/W1 6/LX545A/1") {
+    val actual: Boolean = canProcess(0 -> "12AUG1 30SEP1 1234567/W1 6/LX545A/1")
+
+    actual should be(false)
+  }
+
   test("Can process valid FlightInformation line") {
     val propValidPeriodInformation: Prop = forAll(validPeriodInformationLineGen) { (line: String) =>
-      (!line.isEmpty) ==> {
-        val canProcessLine = canProcess(0 -> line)
-
-        canProcessLine == true
-      }
+      canProcess(0 -> line)
     }
 
     check(propValidPeriodInformation)
@@ -39,9 +41,7 @@ class PeriodInformationModuleCanProcessSuite extends FunSuite with Matchers with
 
   test("Cannot process invalid FlightInformation line") {
     val propInvalidPeriodInformation: Prop = forAll(invalidPeriodInformationLineGen) { (line: String) =>
-      val canProcessLine = canProcess(0 -> line)
-
-      canProcessLine == false
+      !canProcess(0 -> line)
     }
 
     check(propInvalidPeriodInformation)
@@ -94,14 +94,13 @@ class PeriodInformationModuleCanProcessSuite extends FunSuite with Matchers with
 
   def daysOfOperationGen: Gen[String] =
     for {
-      hasFirstChar <- arbitrary[Boolean]
       hasSecondChar <- arbitrary[Boolean]
       hasThirdChar <- arbitrary[Boolean]
       hasFourthChar <- arbitrary[Boolean]
       hasFifthChar <- arbitrary[Boolean]
       hasSixthChar <- arbitrary[Boolean]
       hasSeventhChar <- arbitrary[Boolean]
-      firstChar <- if (hasFirstChar) Gen.const("1") else Gen.const("")
+      firstChar <- Gen.const("1")
       secondChar <- if (hasSecondChar) Gen.const("2") else Gen.const("")
       thirdChar <- if (hasThirdChar) Gen.const("3") else Gen.const("")
       fourthChar <- if (hasFourthChar) Gen.const("4") else Gen.const("")
@@ -120,9 +119,9 @@ class PeriodInformationModuleCanProcessSuite extends FunSuite with Matchers with
 
   def restGen: Gen[String] =
     for {
-      hasFrequencyRateChar <- arbitrary[Boolean]
+      hasFrequencyRateChars <- arbitrary[Boolean]
       rest <- {
-        if (hasFrequencyRateChar)
+        if (hasFrequencyRateChars)
           Gen.oneOf(List(true, false)) flatMap {
             if (_) Gen.alphaStr.map("/W1" + _) else Gen.alphaStr.map("/W2" + _)
           }

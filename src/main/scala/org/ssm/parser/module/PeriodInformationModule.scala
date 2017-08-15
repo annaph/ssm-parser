@@ -1,6 +1,7 @@
 package org.ssm.parser.module
 
-import java.time.{DayOfWeek, LocalDate}
+import java.time.LocalDate.now
+import java.time.{DayOfWeek, LocalDate, Month}
 
 import org.ssm.parser.SSMProcess.Input
 import org.ssm.parser.domain._
@@ -17,10 +18,14 @@ object PeriodInformationModule extends SSMModule {
   private val reg = """(^\d{2}[A-Z]{3}\d{0,2}\s)(\d{2}[A-Z]{3}\d{0,2}\s)(\d{1,7})(.*$)""".r
 
   def canProcess(input: Input): Boolean = input._2 match {
-    case reg(_, _, _, rest) if rest.startsWith("/") && rest.length >= 3 =>
-      true
-    case reg(_, _, _, rest) if !rest.startsWith("/") =>
-      true
+    case reg(fromDate, toDate, _, frequencyRate)
+      if (frequencyRate.startsWith("/") && frequencyRate.length >= 3) || !frequencyRate.startsWith("/") =>
+      (fromDate.length, toDate.length) match {
+        case (6, 6) | (6, 8) | (8, 6) | (8, 8) =>
+          true
+        case _ =>
+          false
+      }
     case _ =>
       false
   }
@@ -36,7 +41,17 @@ object PeriodInformationModule extends SSMModule {
 
   private[module] def format(rawData: ExtractedData): Try[PeriodInformation] = ???
 
-  private[module] def formatDates(fromDate: String, toDate: String): Try[(LocalDate, LocalDate)] = ???
+  private[module] def formatDates(fromDate: String, toDate: String): Try[(LocalDate, LocalDate)] =
+    Try {
+      fromDate.toLocalDate -> toDate.toLocalDate
+    } match {
+      case Success((from, to)) if !(to isBefore from) =>
+        Success(from -> to)
+      case Success(_) =>
+        Failure(new Exception(s"To date '$toDate' must be equal or greater than from date '$fromDate'"))
+      case Failure(e) =>
+        Failure(new Exception(s"From date '$fromDate' and/or to date '$toDate' invalid", e))
+    }
 
   private[module] def formatDaysOfOperation(daysOfOperation: String): Try[List[DayOfWeek]] = {
     import scala.collection.mutable
@@ -81,4 +96,36 @@ object PeriodInformationModule extends SSMModule {
     } else {
       Failure(new Exception(s"Frequency rate in '$frequencyRate' invalid"))
     }
+
+  object Date {
+    def unapply(whole: String): Option[(Int, Month, Option[Int])] = {
+      Some((whole.day, whole.month, whole.year))
+    }
+  }
+
+  implicit def toDateOps(date: String): DateOps =
+    new DateOps(date)
+
+  class DateOps(date: String) {
+    def toLocalDate: LocalDate = date match {
+      case Date(day, month, Some(year)) =>
+        LocalDate of(year, month, day)
+      case Date(day, month, None) =>
+        LocalDate of(now.getYear, month, day)
+    }
+
+    def day: Int =
+      (date take 2).toInt
+
+    def month: Month =
+      SSMModule.toMonth(date substring(2, 5)).get
+
+    def year: Option[Int] =
+      if (date.length == 8) {
+        Some(2000 + date.substring(6).toInt)
+      } else {
+        None
+      }
+  }
+
 }
