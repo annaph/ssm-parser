@@ -1,6 +1,7 @@
 package org.ssm.parser.module
 
 import java.time.Month
+import java.time.Month._
 
 import org.ssm.parser.SSMProcess.Input
 import org.ssm.parser.domain.SSMMessage
@@ -47,29 +48,29 @@ object SSMModule {
 
   def toMonth(str: String): Option[Month] = str match {
     case "JAN" =>
-      Some(Month.JANUARY)
+      Some(JANUARY)
     case "FEB" =>
-      Some(Month.FEBRUARY)
+      Some(FEBRUARY)
     case "MAR" =>
-      Some(Month.MARCH)
+      Some(MARCH)
     case "APR" =>
-      Some(Month.APRIL)
+      Some(APRIL)
     case "MAY" =>
-      Some(Month.MAY)
+      Some(MAY)
     case "JUN" =>
-      Some(Month.JUNE)
+      Some(JUNE)
     case "JUL" =>
-      Some(Month.JULY)
+      Some(JULY)
     case "AUG" =>
-      Some(Month.AUGUST)
+      Some(AUGUST)
     case "SEP" =>
-      Some(Month.SEPTEMBER)
+      Some(SEPTEMBER)
     case "OCT" =>
-      Some(Month.OCTOBER)
+      Some(OCTOBER)
     case "NOV" =>
-      Some(Month.NOVEMBER)
+      Some(NOVEMBER)
     case "DEC" =>
-      Some(Month.DECEMBER)
+      Some(DECEMBER)
     case _ =>
       None
   }
