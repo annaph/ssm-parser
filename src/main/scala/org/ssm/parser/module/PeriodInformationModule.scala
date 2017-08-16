@@ -39,7 +39,17 @@ object PeriodInformationModule extends SSMModule {
       (fromDate.trim(), toDate.trim(), daysOfOperation, None)
   }
 
-  private[module] def format(rawData: ExtractedData): Try[PeriodInformation] = ???
+  private[module] def format(rawData: ExtractedData): Try[PeriodInformation] =
+    for {
+      (fromDate, toDate) <- formatDates(rawData._1, rawData._2)
+      daysOfOperation <- formatDaysOfOperation(rawData._3)
+      frequencyRate <- rawData._4 match {
+        case Some(str) =>
+          formatFrequencyRate(str)
+        case None =>
+          Success(OneWeekFrequencyRate)
+      }
+    } yield PeriodInformation(fromDate, toDate, daysOfOperation, frequencyRate)
 
   private[module] def formatDates(fromDate: String, toDate: String): Try[(LocalDate, LocalDate)] =
     Try {
