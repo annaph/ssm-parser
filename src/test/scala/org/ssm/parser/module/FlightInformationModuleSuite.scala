@@ -27,15 +27,14 @@ class FlightInformationModuleSuite extends FunSuite with Matchers with Checkers 
     actual should be(FlightDesignator("LX", 983))
   }
 
-  test("Process input - state with one SubMessages") {
+  test("Process input - state with one SubMessage") {
     new TestFixture {
       val state = SSMMessage(messageReference, List(subMessage1))
 
       val actual: SSMMessage = process(input, state)
 
       actual.messageReference should be(state.messageReference)
-      actual.subMessages should be(List(
-        subMessage1.copy(flightDesignator = newFlightDesignator)))
+      actual.subMessages should be(subMessage1.copy(flightDesignator = newFlightDesignator) :: Nil)
     }
   }
 
@@ -46,9 +45,7 @@ class FlightInformationModuleSuite extends FunSuite with Matchers with Checkers 
       val actual: SSMMessage = process(input, state)
 
       actual.messageReference should be(state.messageReference)
-      actual.subMessages should be(List(
-        subMessage1.copy(flightDesignator = newFlightDesignator),
-        subMessage2))
+      actual.subMessages should be(subMessage1.copy(flightDesignator = newFlightDesignator) :: subMessage2 :: Nil)
     }
   }
 }

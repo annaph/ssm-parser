@@ -11,10 +11,12 @@ import org.ssm.parser.module.ActionModule._
 class ActionModuleSuite extends FunSuite with Matchers with Checkers {
 
   trait TestFixture {
-    private val flightDesignator = FlightDesignator("LX", 543)
-    private val subMessage = SubMessage(Some(CNL), Some(flightDesignator), List())
+    val input = 0 -> "NEW"
 
-    val state = SSMMessage(Some("24MAY00144E003"), List(subMessage))
+    val messageReference = Some("24MAY00144E003")
+    val subMessage = SubMessage(Some(CNL), Some(FlightDesignator("LX", 543)), List())
+
+    val newSubMessage = SubMessage(Some(NEW), None, List())
   }
 
   test("Extract input - NEW") {
@@ -29,12 +31,25 @@ class ActionModuleSuite extends FunSuite with Matchers with Checkers {
     actual should be("NEW")
   }
 
-  test("Process input") {
+  test("Process input - state with empty SubMessages") {
     new TestFixture {
-      val actual: SSMMessage = process(0 -> "NEW", state)
+      val state = SSMMessage(messageReference, Nil)
+
+      val actual: SSMMessage = process(input, state)
 
       actual.messageReference should be(state.messageReference)
-      actual.subMessages should be(SubMessage(Some(NEW), None, List()) :: state.subMessages)
+      actual.subMessages should be(newSubMessage :: Nil)
+    }
+  }
+
+  test("Process input - state with one SubMessage") {
+    new TestFixture {
+      val state = SSMMessage(messageReference, List(subMessage))
+
+      val actual: SSMMessage = process(input, state)
+
+      actual.messageReference should be(state.messageReference)
+      actual.subMessages should be(newSubMessage :: subMessage :: Nil)
     }
   }
 }
