@@ -6,51 +6,51 @@ import org.scalatest.{FunSuite, Matchers}
 import org.ssm.parser.domain._
 import org.ssm.parser.module.PeriodInformationModule.formatFrequencyRate
 
-import scala.util.{Success, Try}
+import scala.util.Try
 
 @RunWith(classOf[JUnitRunner])
 class PeriodInformationModuleFrequencyRateSuite extends FunSuite with Matchers {
 
   test("Format frequency rate - /W1") {
     val frequencyRate = "/W1"
-    val actual: Try[FrequencyRate] = formatFrequencyRate(frequencyRate)
+    val actual: FrequencyRate = formatFrequencyRate(frequencyRate).get
 
-    actual should be(Success(OneWeekFrequencyRate))
+    actual should be(OneWeekFrequencyRate)
   }
 
   test("Format frequency rate - /W1 6/LX545A/1") {
     val frequencyRate = "/W1 6/LX545A/1"
-    val actual: Try[FrequencyRate] = formatFrequencyRate(frequencyRate)
+    val actual: FrequencyRate = formatFrequencyRate(frequencyRate).get
 
-    actual should be(Success(OneWeekFrequencyRate))
+    actual should be(OneWeekFrequencyRate)
   }
 
   test("Format frequency rate - /W2") {
     val frequencyRate = "/W2"
-    val actual: Try[FrequencyRate] = formatFrequencyRate(frequencyRate)
+    val actual: FrequencyRate = formatFrequencyRate(frequencyRate).get
 
-    actual should be(Success(TwoWeekFrequencyRate))
+    actual should be(TwoWeekFrequencyRate)
   }
 
   test("Format frequency rate - /W2 6/LX545A/1") {
     val frequencyRate = "/W2 6/LX545A/1"
-    val actual: Try[FrequencyRate] = formatFrequencyRate(frequencyRate)
+    val actual: FrequencyRate = formatFrequencyRate(frequencyRate).get
 
-    actual should be(Success(TwoWeekFrequencyRate))
+    actual should be(TwoWeekFrequencyRate)
   }
 
   test("""Format default frequency rate - """"") {
     val frequencyRate = ""
-    val actual: Try[FrequencyRate] = formatFrequencyRate(frequencyRate)
+    val actual: FrequencyRate = formatFrequencyRate(frequencyRate).get
 
-    actual should be(Success(OneWeekFrequencyRate))
+    actual should be(OneWeekFrequencyRate)
   }
 
   test("Format default frequency rate - _6/LX545A/1") {
     val frequencyRate = " 6/LX545A/1"
-    val actual: Try[FrequencyRate] = formatFrequencyRate(frequencyRate)
+    val actual: FrequencyRate = formatFrequencyRate(frequencyRate).get
 
-    actual should be(Success(OneWeekFrequencyRate))
+    actual should be(OneWeekFrequencyRate)
   }
 
   test("Format frequency rate with failure - /") {

@@ -5,8 +5,6 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.{FunSuite, Matchers}
 import org.ssm.parser.domain.SSMMessage
 
-import scala.util.{Success, Try}
-
 @RunWith(classOf[JUnitRunner])
 class NoExtractModuleSuite extends FunSuite with Matchers {
 
@@ -37,9 +35,9 @@ class NoExtractModuleSuite extends FunSuite with Matchers {
 
   test("Format raw data") {
     new TestFixture {
-      val actual: Try[Unit] = format(rawData)
+      val actual: Unit = format(rawData).get
 
-      actual should be(Success(rawData))
+      actual should be(rawData)
     }
   }
 }
