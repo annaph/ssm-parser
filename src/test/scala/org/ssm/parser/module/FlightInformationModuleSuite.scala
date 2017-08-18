@@ -8,8 +8,6 @@ import org.ssm.parser.SSMProcess.Input
 import org.ssm.parser.domain._
 import org.ssm.parser.module.FlightInformationModule._
 
-import scala.util.{Success, Try}
-
 @RunWith(classOf[JUnitRunner])
 class FlightInformationModuleSuite extends FunSuite with Matchers with Checkers {
 
@@ -18,22 +16,38 @@ class FlightInformationModuleSuite extends FunSuite with Matchers with Checkers 
 
     val subMessage1 = SubMessage(Some(NEW), None, List())
     val subMessage2 = SubMessage(Some(CNL), None, List())
-    val state = SSMMessage(Some("24MAY00144E003"), List(subMessage1, subMessage2))
+
+    val messageReference = Some("24MAY00144E003")
+    val newFlightDesignator = Some(FlightDesignator("LX", 544))
   }
 
   test("Format raw data - (LX, 983)") {
-    val actual: Try[FlightDesignator] = format("LX" -> "983")
+    val actual: FlightDesignator = format("LX" -> "983").get
 
-    actual should be(Success(FlightDesignator("LX", 983)))
+    actual should be(FlightDesignator("LX", 983))
   }
 
-  test("Process input") {
+  test("Process input - state with one SubMessages") {
     new TestFixture {
+      val state = SSMMessage(messageReference, List(subMessage1))
+
       val actual: SSMMessage = process(input, state)
 
       actual.messageReference should be(state.messageReference)
       actual.subMessages should be(List(
-        subMessage1.copy(flightDesignator = Some(FlightDesignator("LX", 544))),
+        subMessage1.copy(flightDesignator = newFlightDesignator)))
+    }
+  }
+
+  test("Process input - state with two SubMessages") {
+    new TestFixture {
+      val state = SSMMessage(messageReference, List(subMessage1, subMessage2))
+
+      val actual: SSMMessage = process(input, state)
+
+      actual.messageReference should be(state.messageReference)
+      actual.subMessages should be(List(
+        subMessage1.copy(flightDesignator = newFlightDesignator),
         subMessage2))
     }
   }
