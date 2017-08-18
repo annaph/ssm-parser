@@ -2,13 +2,12 @@ package org.ssm.parser.module
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.prop.Checkers
 import org.scalatest.{FunSuite, Matchers}
 import org.ssm.parser.domain.SSMMessage
 import org.ssm.parser.module.MessageReferenceModule._
 
 @RunWith(classOf[JUnitRunner])
-class MessageReferenceModuleSuite extends FunSuite with Matchers with Checkers {
+class MessageReferenceModuleSuite extends FunSuite with Matchers {
 
   test("Extract input - 24MAY00144E003/REF 123/449") {
     val actual: String = extract(0 -> "24MAY00144E003/REF 123/449")

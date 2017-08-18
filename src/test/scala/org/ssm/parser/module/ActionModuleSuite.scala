@@ -2,13 +2,12 @@ package org.ssm.parser.module
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.prop.Checkers
 import org.scalatest.{FunSuite, Matchers}
 import org.ssm.parser.domain._
 import org.ssm.parser.module.ActionModule._
 
 @RunWith(classOf[JUnitRunner])
-class ActionModuleSuite extends FunSuite with Matchers with Checkers {
+class ActionModuleSuite extends FunSuite with Matchers {
 
   trait TestFixture {
     val input = 0 -> "NEW"
