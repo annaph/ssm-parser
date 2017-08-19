@@ -1,6 +1,6 @@
 package org.ssm.parser
 
-import org.ssm.parser.domain.SSMMessage
+import org.ssm.parser.model.SSMMessage
 
 import scala.util.Properties.lineSeparator
 

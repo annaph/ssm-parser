@@ -3,7 +3,7 @@ package org.ssm.parser.module
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{FunSuite, Matchers}
-import org.ssm.parser.domain.SSMMessage
+import org.ssm.parser.model.SSMMessage
 import org.ssm.parser.module.MessageReferenceModule._
 
 @RunWith(classOf[JUnitRunner])

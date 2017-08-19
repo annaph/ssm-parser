@@ -4,7 +4,7 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{FunSuite, Matchers}
 import org.ssm.parser.SSMProcess.Input
-import org.ssm.parser.domain._
+import org.ssm.parser.model._
 import org.ssm.parser.module.FlightInformationModule._
 
 @RunWith(classOf[JUnitRunner])

@@ -1,4 +1,4 @@
-package org.ssm.parser.domain
+package org.ssm.parser.model
 
 import java.time.{DayOfWeek, LocalDate}
 

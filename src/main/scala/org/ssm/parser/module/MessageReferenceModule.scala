@@ -1,7 +1,7 @@
 package org.ssm.parser.module
 
 import org.ssm.parser.SSMProcess.Input
-import org.ssm.parser.domain.SSMMessage
+import org.ssm.parser.model.SSMMessage
 import org.ssm.parser.module.SSMModule._
 import org.ssm.parser.util.PipeOps.toPipe
 

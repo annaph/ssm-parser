@@ -4,7 +4,7 @@ import java.time.Month
 import java.time.Month._
 
 import org.ssm.parser.SSMProcess.Input
-import org.ssm.parser.domain.SSMMessage
+import org.ssm.parser.model.SSMMessage
 
 import scala.util.matching.Regex
 import scala.util.{Success, Try}

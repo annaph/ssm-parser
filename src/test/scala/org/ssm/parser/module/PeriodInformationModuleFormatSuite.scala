@@ -7,7 +7,7 @@ import java.time.Month.{AUGUST, SEPTEMBER}
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{FunSuite, Matchers}
-import org.ssm.parser.domain.{OneWeekFrequencyRate, PeriodInformation}
+import org.ssm.parser.model.{OneWeekFrequencyRate, PeriodInformation}
 import org.ssm.parser.module.PeriodInformationModule.{ExtractedData, format}
 
 import scala.util.Try

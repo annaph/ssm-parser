@@ -1,7 +1,7 @@
 package org.ssm.parser.module
 
 import org.ssm.parser.SSMProcess.Input
-import org.ssm.parser.domain.{FlightDesignator, SSMMessage}
+import org.ssm.parser.model.{FlightDesignator, SSMMessage}
 import org.ssm.parser.module.SSMModule.matchThreeGroupLine
 import org.ssm.parser.util.PipeOps.toPipe
 

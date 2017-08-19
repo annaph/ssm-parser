@@ -4,7 +4,7 @@ import java.time.LocalDate.now
 import java.time.{DayOfWeek, LocalDate, Month}
 
 import org.ssm.parser.SSMProcess.Input
-import org.ssm.parser.domain._
+import org.ssm.parser.model._
 import org.ssm.parser.util.PipeOps.toPipe
 
 import scala.annotation.tailrec
