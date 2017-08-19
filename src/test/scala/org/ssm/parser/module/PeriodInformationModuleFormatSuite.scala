@@ -21,8 +21,8 @@ class PeriodInformationModuleFormatSuite extends FunSuite with Matchers {
     val invalidDate = "77JAN17"
     val daysOfOperation = "123"
     val invalidDaysOfOperation = "321"
-    val w1FrequncyRate = "/W1"
-    val invalidFrequencyRate = "invalid"
+    val w1FrequncyRate = "W1"
+    val invalidFrequencyRate = "W3"
   }
 
   test("Format raw data - (12AUG17, 30SEP17, 123)") {
@@ -38,7 +38,7 @@ class PeriodInformationModuleFormatSuite extends FunSuite with Matchers {
     }
   }
 
-  test("Format raw data - (12AUG17, 30SEP17, 123, /W1)") {
+  test("Format raw data - (12AUG17, 30SEP17, 123, W1)") {
     new TestFixture {
       val rawData: ExtractedData = (fromDate, toDate, daysOfOperation, Some(w1FrequncyRate))
       val actual: PeriodInformation = format(rawData).get

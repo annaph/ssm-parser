@@ -5,6 +5,7 @@ import java.time.{DayOfWeek, LocalDate, Month}
 
 import org.ssm.parser.SSMProcess.Input
 import org.ssm.parser.domain._
+import org.ssm.parser.util.PipeOps.toPipe
 
 import scala.annotation.tailrec
 import scala.util.{Failure, Success, Try}
@@ -30,7 +31,17 @@ object PeriodInformationModule extends SSMModule {
       false
   }
 
-  def process(input: Input, state: SSMMessage): SSMMessage = ???
+  def process(input: Input, state: SSMMessage): SSMMessage =
+    input |> extract |> format match {
+      case Success(newPeriodInformation) =>
+        val firstSubMessage = state.subMessages.head
+        val newSubMessage = firstSubMessage copy (periodInformations =
+          newPeriodInformation :: firstSubMessage.periodInformations)
+
+        state copy (subMessages = newSubMessage :: (state.subMessages drop 1))
+      case Failure(e) =>
+        throw new Exception(e)
+    }
 
   private[module] def extract(input: Input): ExtractedData = input._2 match {
     case reg(fromDate, toDate, daysOfOperation, rest) if rest.startsWith("/") && rest.length >= 3 =>
@@ -91,21 +102,14 @@ object PeriodInformationModule extends SSMModule {
     }
   }
 
-  private[module] def formatFrequencyRate(frequencyRate: String): Try[FrequencyRate] =
-    if (frequencyRate.isEmpty || (frequencyRate startsWith " ")) {
+  private[module] def formatFrequencyRate(frequencyRate: String): Try[FrequencyRate] = frequencyRate match {
+    case "W1" =>
       Success(OneWeekFrequencyRate)
-    } else if (frequencyRate startsWith "/") {
-      frequencyRate.take(3) match {
-        case "/W1" =>
-          Success(OneWeekFrequencyRate)
-        case "/W2" =>
-          Success(TwoWeekFrequencyRate)
-        case _ =>
-          Failure(new Exception(s"Frequency rate in '$frequencyRate' invalid"))
-      }
-    } else {
+    case "W2" =>
+      Success(TwoWeekFrequencyRate)
+    case _ =>
       Failure(new Exception(s"Frequency rate in '$frequencyRate' invalid"))
-    }
+  }
 
   object Date {
     def unapply(whole: String): Option[(Int, Month, Option[Int])] = {

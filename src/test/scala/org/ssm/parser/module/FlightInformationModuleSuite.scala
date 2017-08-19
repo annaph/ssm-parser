@@ -33,7 +33,8 @@ class FlightInformationModuleSuite extends FunSuite with Matchers {
       val actual: SSMMessage = process(input, state)
 
       actual.messageReference should be(state.messageReference)
-      actual.subMessages should be(subMessage1.copy(flightDesignator = newFlightDesignator) :: Nil)
+      actual.subMessages should be(
+        subMessage1.copy(flightDesignator = newFlightDesignator) :: Nil)
     }
   }
 
@@ -44,7 +45,8 @@ class FlightInformationModuleSuite extends FunSuite with Matchers {
       val actual: SSMMessage = process(input, state)
 
       actual.messageReference should be(state.messageReference)
-      actual.subMessages should be(subMessage1.copy(flightDesignator = newFlightDesignator) :: subMessage2 :: Nil)
+      actual.subMessages should be(
+        subMessage1.copy(flightDesignator = newFlightDesignator) :: subMessage2 :: Nil)
     }
   }
 }
