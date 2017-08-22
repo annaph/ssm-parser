@@ -1,11 +1,9 @@
 package org.ssm.parser
 
-import SSMProcess._
+import org.ssm.parser.SSMProcess._
 
-class SSMReceiver extends Function2[Option[Input], SSMProcess, SSMProcess] {
-  override def apply(input: Option[Input], prev: SSMProcess): SSMProcess = ???
-}
-
-object SSMReceiver {
-  def apply(): SSMReceiver = new SSMReceiver()
+object SSMReceiver extends Function2[Option[Input], SSMProcess, SSMProcess] {
+  override def apply(input: Option[Input], prev: SSMProcess): SSMProcess = {
+    ???
+  }
 }
