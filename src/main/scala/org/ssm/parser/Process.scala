@@ -38,7 +38,7 @@ object Process {
   def await[I, O, S](recv: (Option[I], Process[I, O, S]) => Process[I, O, S]): Process[I, O, S] =
     Await(recv)
 
-  def parse[K, I, O, S](kind: K)(run: (I, S, K) => (S, Process[I, O, S])): Process[I, O, S] =
+  def parse[K, I, O, S](kind: K)(implicit run: (I, S, K) => (S, Process[I, O, S])): Process[I, O, S] =
     Parse(kind, run)
 
   def emit[I, O, S](o: O, next: Process[I, O, S] = end[I, O, S]): Process[I, O, S] =
