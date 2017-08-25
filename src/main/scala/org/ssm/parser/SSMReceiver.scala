@@ -19,6 +19,22 @@ object SSMReceiver extends Function2[Option[Input], SSMProcess, SSMProcess] {
       if (TimeModeModule canProcess in) parse(TimeMode) else kill(in)
     case (Some(in), Parse(TimeMode, _)) =>
       if (MessageReferenceModule canProcess in) parse(Reference) else kill(in)
+    case (Some(in), Parse(Reference, _)) =>
+      if (ActionModule canProcess in) parse(Action) else kill(in)
+    case (Some(in), Parse(SubAction, _)) =>
+      if (ActionModule canProcess in) parse(Action) else kill(in)
+    case (Some(in), Parse(Action, _)) =>
+      if (FlightInformationModule canProcess in) parse(FlightInformation) else kill(in)
+    case (Some(in), Parse(FlightInformation, _)) =>
+      if (PeriodInformationModule canProcess in) parse(PeriodInformation) else kill(in)
+    case (Some(in), Parse(PeriodInformation, _)) =>
+      if (PeriodInformationModule canProcess in) {
+        parse(PeriodInformation)
+      } else if (OtherInformationModule canProcess in) {
+        parse(OtherInformation)
+      } else {
+        kill(in)
+      }
     case _ =>
       ???
   }

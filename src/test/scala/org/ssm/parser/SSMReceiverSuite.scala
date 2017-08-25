@@ -19,6 +19,10 @@ class SSMReceiverSuite extends FunSuite with Matchers {
     val timeModeInput = 4 -> "UTC"
     val referenceInput = 5 -> "24MAY00144E003/REF 123/449"
     val actionInput = 6 -> "NEW XASM"
+    val flightInformationInput = 7 -> "LX544A 1/LX/LH 3/LX 4/LH 5/LX 9/LX"
+    val periodInformationInput = 8 -> "12AUG 30SEP 1234567/W2 6/LX545A/1"
+    val otherInformationInput = 9 -> "G M80 FCYML/FNCN.FCM"
+    val subActionInput = 10 -> "//"
 
     val startProcess: SSMProcess = start {
       ssmMessage -> await(SSMReceiver)
@@ -27,6 +31,12 @@ class SSMReceiverSuite extends FunSuite with Matchers {
     val parseFromAddressProcess = parse(FromAddress)(SSMParser)
     val parseIdentifierProcess = parse(Identifier)(SSMParser)
     val parseTimeModeProcess = parse(TimeMode)(SSMParser)
+    val parseReferenceProcess = parse(Reference)(SSMParser)
+    val parseSubActionProcess = parse(SubAction)(SSMParser)
+    val parseActionProcess = parse(Action)(SSMParser)
+    val parseFlightInformationProcess = parse(FlightInformation)(SSMParser)
+    val parsePeriodInformationProcess = parse(PeriodInformation)(SSMParser)
+    val parseOtherInformationProcess = parse(OtherInformation)(SSMParser)
   }
 
   test("To Address input & previous process Start") {
@@ -164,45 +174,185 @@ class SSMReceiverSuite extends FunSuite with Matchers {
     }
   }
 
-  test("Previous state Parse-Reference & Action input") {
-    ???
+  test("Action input & previous process Parse-Reference") {
+    new TestFixture {
+      val actual: SSMProcess = SSMReceiver(Some(actionInput), parseReferenceProcess)
+
+      actual match {
+        case Parse(kind, run) =>
+          kind should be(Action)
+          run should be(SSMParser)
+        case _ =>
+          fail()
+      }
+    }
   }
 
-  test("Previous state Parse-Reference & improper input") {
-    ???
+  test("Action input & previous process Parse-SubAction") {
+    new TestFixture {
+      val actual: SSMProcess = SSMReceiver(Some(actionInput), parseSubActionProcess)
+
+      actual match {
+        case Parse(kind, run) =>
+          kind should be(Action)
+          run should be(SSMParser)
+        case _ =>
+          fail()
+      }
+    }
   }
 
-  test("Previous state Parse-Action & Flight Information input") {
-    ???
+  test("Improper input & previous process Parse-Reference") {
+    new TestFixture {
+      val actual: SSMProcess = SSMReceiver(Some(flightInformationInput), parseReferenceProcess)
+
+      actual match {
+        case Halt(Some(input), Kill) =>
+          input should be(flightInformationInput)
+        case _ =>
+          fail()
+      }
+    }
   }
 
-  test("Previous state Parse-Action & improper input") {
-    ???
+  test("Improper input & previous process Parse-SubAction") {
+    new TestFixture {
+      val actual: SSMProcess = SSMReceiver(Some(flightInformationInput), parseSubActionProcess)
+
+      actual match {
+        case Halt(Some(input), Kill) =>
+          input should be(flightInformationInput)
+        case _ =>
+          fail()
+      }
+    }
   }
 
-  test("Previous state Parse-FlightInformation & Period Information input") {
-    ???
+  test("Flight Information input & previous process Parse-Action") {
+    new TestFixture {
+      val actual: SSMProcess = SSMReceiver(Some(flightInformationInput), parseActionProcess)
+
+      actual match {
+        case Parse(kind, run) =>
+          kind should be(FlightInformation)
+          run should be(SSMParser)
+        case _ =>
+          fail()
+      }
+    }
   }
 
-  test("Previous state Parse-FlightInformation & improper input") {
-    ???
+  test("Improper input & previous process Parse-Action") {
+    new TestFixture {
+      val actual: SSMProcess = SSMReceiver(Some(periodInformationInput), parseActionProcess)
+
+      actual match {
+        case Halt(Some(input), Kill) =>
+          input should be(periodInformationInput)
+        case _ =>
+          fail()
+      }
+    }
   }
 
-  test("Previous state Parse-PeriodInformation & Period Information input") {
-    ???
+  test("Period Information input & previous process Parse-FlightInformation") {
+    new TestFixture {
+      val actual: SSMProcess = SSMReceiver(Some(periodInformationInput), parseFlightInformationProcess)
+
+      actual match {
+        case Parse(kind, run) =>
+          kind should be(PeriodInformation)
+          run should be(SSMParser)
+        case _ =>
+          fail()
+      }
+    }
   }
 
-  test("Previous state Parse-PeriodInformation & Other Information input") {
-    ???
+  test("Improper input & previous process Parse-FlightInformation") {
+    new TestFixture {
+      val actual: SSMProcess = SSMReceiver(Some(otherInformationInput), parseFlightInformationProcess)
+
+      actual match {
+        case Halt(Some(input), Kill) =>
+          input should be(otherInformationInput)
+        case _ =>
+          fail()
+      }
+    }
   }
 
-  test("Previous state Parse-PeriodInformation & improper input") {
-    ???
+  test("Period Information input & previous process Parse-PeriodInformation") {
+    new TestFixture {
+      val actual: SSMProcess = SSMReceiver(Some(periodInformationInput), parsePeriodInformationProcess)
+
+      actual match {
+        case Parse(kind, run) =>
+          kind should be(PeriodInformation)
+          run should be(SSMParser)
+        case _ =>
+          fail()
+      }
+    }
   }
 
-  test("Previous state Parse-OtherInformation & Other Information input") {
-    ???
+  test("Improper input & previous process Parse-PeriodInformation") {
+    new TestFixture {
+      val actual: SSMProcess = SSMReceiver(Some(subActionInput), parsePeriodInformationProcess)
+
+      actual match {
+        case Halt(Some(input), Kill) =>
+          input should be(subActionInput)
+        case _ =>
+          fail()
+      }
+    }
   }
+
+  test("Other Information input & previous process Parse-PeriodInformation") {
+    new TestFixture {
+      val actual: SSMProcess = SSMReceiver(Some(otherInformationInput), parsePeriodInformationProcess)
+
+      actual match {
+        case Parse(kind, run) =>
+          kind should be(OtherInformation)
+          run should be(SSMParser)
+        case _ =>
+          fail()
+      }
+    }
+  }
+
+  test("Other Information input & previous process Parse-OtherInformation") {
+    new TestFixture {
+      val actual: SSMProcess = SSMReceiver(Some(otherInformationInput), parseOtherInformationProcess)
+
+      actual match {
+        case Parse(kind, run) =>
+          kind should be(OtherInformation)
+          run should be(SSMParser)
+        case _ =>
+          fail()
+      }
+    }
+  }
+
+  test("Improper input & previous process Parse-OtherInformation") {
+    new TestFixture {
+      val actual: SSMProcess = SSMReceiver(Some(actionInput), parseOtherInformationProcess)
+
+      actual match {
+        case Halt(Some(input), Kill) =>
+          input should be(actionInput)
+        case _ =>
+          fail()
+      }
+    }
+  }
+
+
+
+
 
   test("Previous state Parse-OtherInformation & Sub-Action input") {
     ???
