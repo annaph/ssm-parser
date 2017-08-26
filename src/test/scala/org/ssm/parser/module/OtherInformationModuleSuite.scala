@@ -29,14 +29,24 @@ class OtherInformationModuleSuite extends FunSuite with Matchers with Checkers {
     actual should be(expected)
   }
 
+  test("Should not be able to process invalid OtherInformation line") {
+    val input: Input = 0 -> "//"
+
+    val actual = canProcess(input)
+    val expected = false
+
+    actual should be(expected)
+  }
+
   test("Can process line as OtherInformation line") {
     val propOtherInformation: Prop = forAll { (line: String) =>
       val canProcessLine = canProcess(0 -> line)
 
-      if (!line.isEmpty)
-        canProcessLine == true
-      else
-        canProcessLine == false
+      if (!line.isEmpty && !(line startsWith "//")) {
+        canProcessLine
+      } else {
+        !canProcessLine
+      }
     }
 
     check(propOtherInformation)

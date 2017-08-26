@@ -114,7 +114,7 @@ object TimeModeModule extends NoExtractModule {
 
 object OtherInformationModule extends NoExtractModule {
   def canProcess(input: Input): Boolean =
-    matchOneGroupLine(input._2, "(.+$)".r)
+    matchOneGroupLine(input._2, "(.+$)".r) && !(input._2 startsWith "//")
 }
 
 object SubMessageModule extends NoExtractModule {

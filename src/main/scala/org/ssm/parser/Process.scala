@@ -24,8 +24,7 @@ object Process {
                                run: (I, S, K) => (S, Process[I, O, S]))
     extends Process[I, O, S]
 
-  case class Emit[I, S, O](o: O,
-                           next: Process[I, O, S])
+  case class Emit[I, S, O](f: S => (O, Process[I, O, S]))
     extends Process[I, O, S]
 
   case class Halt[I, O, S](i: Option[I],
@@ -41,8 +40,8 @@ object Process {
   def parse[K, I, O, S](kind: K)(implicit run: (I, S, K) => (S, Process[I, O, S])): Process[I, O, S] =
     Parse(kind, run)
 
-  def emit[I, O, S](o: O, next: Process[I, O, S] = end[I, O, S]): Process[I, O, S] =
-    Emit(o, next)
+  def emit[I, O, S](f: S => (O, Process[I, O, S])): Process[I, O, S] =
+    Emit(f)
 
   def end[I, O, S]: Process[I, O, S] =
     Halt(None, End)
@@ -71,11 +70,11 @@ case object PeriodInformation extends SSMParseKind
 
 case object OtherInformation extends SSMParseKind
 
-case object SubAction extends SSMParseKind
+case object SubMessage extends SSMParseKind
 
 object SSMProcess {
   type Input = (Int, String)
-  type ParseResult = (SSMMessage, SSMProcess)
+  type Result = (SSMMessage, SSMProcess)
   type SSMProcess = Process[Input, SSMMessage, SSMMessage]
 
   def parseSSMMessage(str: String): SSMMessage =
